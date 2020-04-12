@@ -22,7 +22,7 @@ type IGTimelineData struct {
 }
 
 type IGTimelineUser struct {
-	User IGTimelineMedia `json:"edge_owner_to_timeline_media"`
+	Media IGTimelineMedia `json:"edge_owner_to_timeline_media"`
 }
 
 type IGTimelineMedia struct {
@@ -116,37 +116,28 @@ func getUserTimelineMediaFromURL(url string) *IGTimeline {
 func main() {
 	// I get by, with a little help, from this blog:
 	// http://go-colly.org/articles/how_to_scrape_instagram/
+
+	// Retrieve user metadata
 	username := "eklhad"
 	userInfoURL := fmt.Sprintf("%s/%s/?__a=1", BASE_URL, username)
 	userMetadata := getUserMetadataFromInstagramURL(userInfoURL)
 	userID := userMetadata.GraphQL.User.ID
 
-	fmt.Println(userID)
+	// Retrieve first page of user results
+	hasNextPage := true
+	endCursor := ""
 
-	//  after getting the profile metadata, switch to using these urls for retrieving photos
-	queryMediaVars := url.QueryEscape(fmt.Sprintf("{\"id\":\"%s\",\"first\":12,\"after\":\"%s\"}", userID, ""))
-	nextPageURL := fmt.Sprintf("%s/%s&variables=%s", BASE_URL, "graphql/query/?query_id=17888483320059182", queryMediaVars)
-	fmt.Println(nextPageURL)
-	timeline := getUserTimelineMediaFromURL(nextPageURL)
-	fmt.Println(timeline)
-	/*
+	for hasNextPage {
+		queryMediaVars := url.QueryEscape(fmt.Sprintf("{\"id\":\"%s\",\"first\":12,\"after\":\"%s\"}", userID, endCursor))
+		nextPageURL := fmt.Sprintf("%s/%s&variables=%s", BASE_URL, "graphql/query/?query_id=17888483320059182", queryMediaVars)
+		fmt.Println(nextPageURL)
+		timeline := getUserTimelineMediaFromURL(nextPageURL)
+		fmt.Println(timeline)
+		hasNextPage := timeline.Data.User.Media.PageInfo.HasNextPage
 		fmt.Println("HAS NEXT PAGE", hasNextPage)
-		fmt.Println("NUM PICS", len(userMetadata.GraphQL.User.TimelineMedia.Edges))
-		fmt.Println("NEXT PAGE URL", nextPageURL)
-		hasNextPage := userMetadata.GraphQL.User.TimelineMedia.PageInfo.HasNextPage
-
 		if hasNextPage {
-			// TODO: this new url returns a different format.
-			endCursor := userMetadata.GraphQL.User.TimelineMedia.PageInfo.EndCursor
-			userID := userMetadata.GraphQL.User.ID
-			queryMediaVars := url.QueryEscape(fmt.Sprintf("{\"id\":\"%s\",\"first\":12,\"after\":\"%s\"}", userID, endCursor))
-			nextPageURL := fmt.Sprintf("%s/%s&variables=%s", BASE_URL, "graphql/query/?query_id=17888483320059182", queryMediaVars)
-			userMetadata = getUserMetadataFromInstagramURL(nextPageURL)
-			hasNextPage = userMetadata.GraphQL.User.TimelineMedia.PageInfo.HasNextPage
-			fmt.Println("HAS NEXT PAGE", hasNextPage)
-			fmt.Println("NUM PICS", len(userMetadata.GraphQL.User.TimelineMedia.Edges))
-			fmt.Println(userMetadata.GraphQL.User.TimelineMedia.PageInfo)
+			endCursor = timeline.Data.User.Media.PageInfo.EndCursor
 			fmt.Println("NEXT PAGE URL", nextPageURL)
 		}
-	*/
+	}
 }
