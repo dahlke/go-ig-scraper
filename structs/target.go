@@ -1,7 +1,6 @@
 package structs
 
-// Instagram Display Structs
-
+// InstagramMedia is the simple struct I put all the information useful to me into.
 type InstagramMedia struct {
 	ShortCode string `json:"shortcode"`
 	Timestamp int    `json:"timestamp"`

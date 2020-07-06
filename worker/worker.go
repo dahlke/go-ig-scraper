@@ -8,6 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// GetDataFromInstagramForUser is used for testing that the API functions work as expected.
 func GetDataFromInstagramForUser(username string, endCursor string) {
 	userID := api.GetUserIDFromMetadata(username)
 	pullAll := endCursor != ""

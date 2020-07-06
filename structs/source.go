@@ -1,81 +1,87 @@
 package structs
 
 /* IG API User Timeline Structs */
+
+// IGAPITimeline gives access to the timeline data.
 type IGAPITimeline struct {
-	Data IGAPITimelineData `json:"data"`
+	Data igAPITimelineData `json:"data"`
 }
 
-type IGAPITimelineData struct {
-	User IGAPITimelineUser `json:"user"`
+type igAPITimelineData struct {
+	User igAPITimelineUser `json:"user"`
 }
 
-type IGAPITimelineUser struct {
-	Media IGAPITimelineMedia `json:"edge_owner_to_timeline_media"`
+type igAPITimelineUser struct {
+	Media igAPITimelineMedia `json:"edge_owner_to_timeline_media"`
 }
 
-type IGAPITimelineMedia struct {
+type igAPITimelineMedia struct {
 	Count    int                        `json:"count"`
-	Edges    []IGAPITimelineMediaEdge   `json:"edges"`
-	PageInfo IGAPITimelineMediaPageInfo `json:"page_info"`
+	Edges    []igAPITimelineMediaEdge   `json:"edges"`
+	PageInfo igAPITimelineMediaPageInfo `json:"page_info"`
 }
 
-type IGAPITimelineMediaPageInfo struct {
+type igAPITimelineMediaPageInfo struct {
 	HasNextPage bool   `json:"has_next_page"`
 	EndCursor   string `json:"end_cursor"`
 }
 
-type IGAPITimelineMediaEdge struct {
-	Node IGAPITimelineMediaEdgeNode `json:"node"`
+type igAPITimelineMediaEdge struct {
+	Node igAPITimelineMediaEdgeNode `json:"node"`
 }
 
-type IGAPITimelineMediaEdgeNode struct {
+type igAPITimelineMediaEdgeNode struct {
 	Shortcode string `json:"shortcode"`
 }
 
 /* IGAPI User Metadata Structs */
+
+// IGAPIUserMetadata gives access to the user metadata.
 type IGAPIUserMetadata struct {
-	GraphQL IGAPIUserGraphQL `json:"graphql"`
+	GraphQL igAPIUserGraphQL `json:"graphql"`
 }
 
-type IGAPIUserGraphQL struct {
-	User IGAPIUser `json:"user"`
+type igAPIUserGraphQL struct {
+	User igAPIUser `json:"user"`
 }
 
-type IGAPIUser struct {
+type igAPIUser struct {
 	ID string `json:"id"`
 }
 
 /* IGAPI Media Structs */
+
+// IGAPIMediaDetail is the struct that is exported and converted to the target struct.
 type IGAPIMediaDetail struct {
-	GraphQL IGAPIMediaGraphQL `json:"graphql"`
+	GraphQL igAPIMediaGraphQL `json:"graphql"`
 }
 
-type IGAPIMediaGraphQL struct {
-	Media IGAPIMediaShortcode `json:"shortcode_media"`
+type igAPIMediaGraphQL struct {
+	Media igAPIMediaShortcode `json:"shortcode_media"`
 }
 
-type IGAPIMediaShortcode struct {
+type igAPIMediaShortcode struct {
 	ID             string                          `json:"id"`
 	Shortcode      string                          `json:"shortcode"`
 	DisplayURL     string                          `json:"display_url"`
 	Timestamp      int                             `json:"taken_at_timestamp"`
-	Location       IGAPIMediaShortcodeLocation     `json:"location"`
-	EdgesToCaption IGAPIMediaCaptionEdgesToCaption `json:"edge_media_to_caption"`
+	Location       igAPIMediaShortcodeLocation     `json:"location"`
+	EdgesToCaption igAPIMediaCaptionEdgesToCaption `json:"edge_media_to_caption"`
 }
 
-type IGAPIMediaShortcodeLocation struct {
+type igAPIMediaShortcodeLocation struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
 }
 
-type IGAPIMediaCaptionEdgesToCaption struct {
-	Edges []IGAPIMediaCaptionEdges `json:"edges"`
+type igAPIMediaCaptionEdgesToCaption struct {
+	Edges []igAPIMediaCaptionEdges `json:"edges"`
 }
 
-type IGAPIMediaCaptionEdges struct {
-	Node IGAPIMediaCaptionEdgeNode `json:"node"`
+type igAPIMediaCaptionEdges struct {
+	Node igAPIMediaCaptionEdgeNode `json:"node"`
 }
 
-type IGAPIMediaCaptionEdgeNode struct {
+type igAPIMediaCaptionEdgeNode struct {
 	Text string `json:"text"`
 }

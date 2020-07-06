@@ -26,7 +26,7 @@ func convertMediaDetail(mediaTimelineSlice []structs.IGAPIMediaDetail) []structs
 
 func getMediaDetailFromShortcode(shortcode string) *structs.IGAPIMediaDetail {
 	// Example URL: https://www.instagram.com/p/B-AlSmXAYFM/?__a=1
-	url := fmt.Sprintf("%s/p/%s/?__a=1", BaseUrl, shortcode)
+	url := fmt.Sprintf("%s/p/%s/?__a=1", BaseURL, shortcode)
 	body := gorammaHTTPRequest(url)
 
 	var mediaDetail = new(structs.IGAPIMediaDetail)
@@ -39,8 +39,9 @@ func getMediaDetailFromShortcode(shortcode string) *structs.IGAPIMediaDetail {
 	return mediaDetail
 }
 
+// GetUserIDFromMetadata retrieves a User ID from the supplied username.
 func GetUserIDFromMetadata(username string) string {
-	url := fmt.Sprintf("%s/%s/?__a=1", BaseUrl, username)
+	url := fmt.Sprintf("%s/%s/?__a=1", BaseURL, username)
 	body := gorammaHTTPRequest(url)
 
 	var userMetadata = new(structs.IGAPIUserMetadata)
@@ -53,6 +54,7 @@ func GetUserIDFromMetadata(username string) string {
 	return userMetadata.GraphQL.User.ID
 }
 
+// GetUserTimelineMedia retrieves all data starting after the endCursor supplied.
 func GetUserTimelineMedia(userID string, endCursor string) ([]structs.InstagramMedia, bool, string) {
 	url := buildGorammaNextPageURL(userID, endCursor)
 	body := gorammaHTTPRequest(url)
