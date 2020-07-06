@@ -4,9 +4,25 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/dahlke/goramma/structs"
+	structs "github.com/dahlke/goramma/structs"
 	log "github.com/sirupsen/logrus"
 )
+
+func convertMediaDetail(mediaTimelineSlice []structs.IGAPIMediaDetail) []structs.InstagramMedia {
+	allConvertedMedia := []structs.InstagramMedia{}
+
+	for _, m := range mediaTimelineSlice {
+		convertedMedia := structs.InstagramMedia{
+			ShortCode: m.GraphQL.Media.Shortcode,
+			Timestamp: m.GraphQL.Media.Timestamp,
+			Location:  m.GraphQL.Media.Location.Name,
+			URL:       m.GraphQL.Media.DisplayURL,
+		}
+		allConvertedMedia = append(allConvertedMedia, convertedMedia)
+	}
+
+	return allConvertedMedia
+}
 
 func getMediaDetailFromShortcode(shortcode string) *structs.IGAPIMediaDetail {
 	// Example URL: https://www.instagram.com/p/B-AlSmXAYFM/?__a=1
@@ -37,7 +53,7 @@ func GetUserIDFromMetadata(username string) string {
 	return userMetadata.GraphQL.User.ID
 }
 
-func GetUserTimelineMedia(userID string, endCursor string) ([]structs.IGAPIMediaDetail, bool, string) {
+func GetUserTimelineMedia(userID string, endCursor string) ([]structs.InstagramMedia, bool, string) {
 	url := buildGorammaNextPageURL(userID, endCursor)
 	body := gorammaHTTPRequest(url)
 
@@ -52,15 +68,16 @@ func GetUserTimelineMedia(userID string, endCursor string) ([]structs.IGAPIMedia
 	hasNextPage := timeline.Data.User.Media.PageInfo.HasNextPage
 	endCursor = timeline.Data.User.Media.PageInfo.EndCursor
 
-	var mediaTimeline []structs.IGAPIMediaDetail
+	var mediaTimelineSlice []structs.IGAPIMediaDetail
 
 	for i, edge := range timelineEdges {
 		shortcode := edge.Node.Shortcode
 
 		log.Info(fmt.Sprintf("Getting the details for media %d of %d...", i, len(timelineEdges)))
 		mediaDetail := getMediaDetailFromShortcode(shortcode)
-		mediaTimeline = append(mediaTimeline, *mediaDetail)
+		mediaTimelineSlice = append(mediaTimelineSlice, *mediaDetail)
 	}
 
-	return mediaTimeline, hasNextPage, endCursor
+	convertedMedia := convertMediaDetail(mediaTimelineSlice)
+	return convertedMedia, hasNextPage, endCursor
 }
