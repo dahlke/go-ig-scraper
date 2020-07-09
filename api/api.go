@@ -75,7 +75,7 @@ func GetUserTimelineMedia(userID string, endCursor string) ([]structs.InstagramM
 	for i, edge := range timelineEdges {
 		shortcode := edge.Node.Shortcode
 
-		log.Info(fmt.Sprintf("Getting the details for media %d of %d...", i, len(timelineEdges)))
+		log.Info(fmt.Sprintf("Getting the details for media %d of %d...", i+1, len(timelineEdges)))
 		mediaDetail := getMediaDetailFromShortcode(shortcode)
 		mediaTimelineSlice = append(mediaTimelineSlice, *mediaDetail)
 	}
