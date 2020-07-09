@@ -12,8 +12,7 @@ import (
 
 func gorammaHTTPRequest(igURL string) []byte {
 	httpClient := http.Client{
-		Timeout:               10 * time.Second,
-		ResponseHeaderTimeout: 10 * time.Second
+		Timeout: 10 * time.Second,
 	}
 
 	req, err := http.NewRequest(http.MethodGet, igURL, nil)
