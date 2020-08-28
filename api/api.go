@@ -12,8 +12,15 @@ func convertMediaDetail(mediaTimelineSlice []structs.IGAPIMediaDetail) []structs
 	allConvertedMedia := []structs.InstagramMedia{}
 
 	for _, m := range mediaTimelineSlice {
+		caption := ""
+
+		if len(m.GraphQL.Media.EdgesToCaption.Edges) > 0 {
+			caption = m.GraphQL.Media.EdgesToCaption.Edges[0].Node.Text
+		}
+
 		convertedMedia := structs.InstagramMedia{
 			ShortCode: m.GraphQL.Media.Shortcode,
+			Caption:   caption,
 			Timestamp: m.GraphQL.Media.Timestamp,
 			Location:  m.GraphQL.Media.Location.Name,
 			URL:       m.GraphQL.Media.DisplayURL,

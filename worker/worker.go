@@ -9,14 +9,15 @@ import (
 )
 
 // GetDataFromInstagramForUser is used for testing that the API functions work as expected.
-func GetDataFromInstagramForUser(username string, endCursor string) {
+func GetDataFromInstagramForUser(username string, inputEndCursor string) {
 	userID := api.GetUserIDFromMetadata(username)
-	pullAll := endCursor != ""
+	pullAll := inputEndCursor == ""
 	var fullConvertedMediaTimeline []structs.InstagramMedia
+	endCursor := inputEndCursor
 
 	for true {
-		// mediaTimeline, hasNextPage, endCursor := api.GetUserTimelineMedia(userID, endCursor)
-		mediaTimeline, hasNextPage, _ := api.GetUserTimelineMedia(userID, endCursor)
+		mediaTimeline, hasNextPage, newEndCursor := api.GetUserTimelineMedia(userID, endCursor)
+		endCursor = newEndCursor
 		fullConvertedMediaTimeline = append(mediaTimeline, fullConvertedMediaTimeline...)
 
 		if hasNextPage && pullAll {
@@ -27,4 +28,6 @@ func GetDataFromInstagramForUser(username string, endCursor string) {
 
 		time.Sleep(3 * time.Second)
 	}
+	// TODO: log the end cursor.
+	// fmt.Println(endCursor, fullConvertedMediaTimeline)
 }
