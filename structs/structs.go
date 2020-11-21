@@ -9,6 +9,7 @@ type InstagramMedia struct {
 	ID        string `json:"id"`
 	Username  string `json:"username"`
 	Caption   string `json:"caption"`
+	Location  string `json:"location"`
 	MediaURL  string `json:"media_url"`
 	MediaType string `json:"media_type"`
 }

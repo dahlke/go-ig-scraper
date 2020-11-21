@@ -2,6 +2,7 @@ package workers
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	api "github.com/dahlke/goramma/api"
@@ -12,7 +13,8 @@ import (
 )
 
 // GetDataFromInstagramForUser is used for testing that the API functions work as expected.
-func GetDataFromInstagramForUser(instagramToken string) {
+func GetDataFromInstagramForUser() {
+	instagramToken := os.Getenv("INSTAGRAM_ACCESS_TOKEN")
 	userMetadata := api.GetUserMetadata(instagramToken)
 	fmt.Println(userMetadata)
 
