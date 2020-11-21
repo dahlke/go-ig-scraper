@@ -3,10 +3,15 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
+	"time"
 
 	structs "github.com/dahlke/goramma/structs"
 	log "github.com/sirupsen/logrus"
 )
+
+// InstagramTimestampFmt is used as a format for parsing dates from the Instagram Graph API
+const InstagramTimestampFmt = "2006-01-02T15:04:05-0700"
 
 // GetUserMetadata will retrieve the user metadata from Instagram Graph API.
 func GetUserMetadata(instagramToken string) structs.InstagramUserMetadata {
@@ -31,6 +36,15 @@ func GetUserMedia(instagramToken string, endCursor string) structs.InstagramUser
 	err := json.Unmarshal(body, &userMedia)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	for i := range userMedia.Data {
+		timestamp, err := time.Parse(InstagramTimestampFmt, userMedia.Data[i].Timestamp)
+		if err != nil {
+			log.Fatal(err)
+		}
+		unixTimestampStr := strconv.FormatInt(timestamp.Unix(), 10)
+		userMedia.Data[i].Timestamp = unixTimestampStr
 	}
 
 	return *userMedia
