@@ -24,7 +24,7 @@ func GetUserMetadata(instagramToken string) structs.InstagramUserMetadata {
 
 // GetUserMedia will retrieve a page of media results from the Instagram Graph API.
 func GetUserMedia(instagramToken string, endCursor string) structs.InstagramUserMedia {
-	url := fmt.Sprintf("%s/me/media?fields=id,media_type,media_url,location,username,timestamp,caption&limit=50&access_token=%s&after=%s", BaseURL, instagramToken, endCursor)
+	url := fmt.Sprintf("%s/me/media?fields=id,media_type,media_url,permalink,username,timestamp,caption&limit=50&access_token=%s&after=%s", BaseURL, instagramToken, endCursor)
 	body := gorammaHTTPRequest(url)
 
 	var userMedia = new(structs.InstagramUserMedia)
