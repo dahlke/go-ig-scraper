@@ -8,85 +8,30 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func convertMediaDetail(mediaTimelineSlice []structs.IGAPIMediaDetail) []structs.InstagramMedia {
-	allConvertedMedia := []structs.InstagramMedia{}
-
-	for _, m := range mediaTimelineSlice {
-		caption := ""
-
-		if len(m.GraphQL.Media.EdgesToCaption.Edges) > 0 {
-			caption = m.GraphQL.Media.EdgesToCaption.Edges[0].Node.Text
-		}
-
-		convertedMedia := structs.InstagramMedia{
-			ShortCode: m.GraphQL.Media.Shortcode,
-			Caption:   caption,
-			Timestamp: m.GraphQL.Media.Timestamp,
-			Location:  m.GraphQL.Media.Location.Name,
-			URL:       m.GraphQL.Media.DisplayURL,
-		}
-		allConvertedMedia = append(allConvertedMedia, convertedMedia)
-	}
-
-	return allConvertedMedia
-}
-
-func getMediaDetailFromShortcode(shortcode string) *structs.IGAPIMediaDetail {
-	// Example URL: https://www.instagram.com/p/B-AlSmXAYFM/?__a=1
-	url := fmt.Sprintf("%s/p/%s/?__a=1", BaseURL, shortcode)
+// GetUserMetadata will retrieve the user metadata from Instagram Graph API.
+func GetUserMetadata(instagramToken string) structs.InstagramUserMetadata {
+	url := fmt.Sprintf("%s/me?fields=id,username&access_token=%s", BaseURL, instagramToken)
 	body := gorammaHTTPRequest(url)
 
-	var mediaDetail = new(structs.IGAPIMediaDetail)
-	err := json.Unmarshal(body, &mediaDetail)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return mediaDetail
-}
-
-// GetUserIDFromMetadata retrieves a User ID from the supplied username.
-func GetUserIDFromMetadata(username string) string {
-	url := fmt.Sprintf("%s/%s/?__a=1", BaseURL, username)
-	body := gorammaHTTPRequest(url)
-
-	var userMetadata = new(structs.IGAPIUserMetadata)
+	var userMetadata = new(structs.InstagramUserMetadata)
 	err := json.Unmarshal(body, &userMetadata)
-
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return userMetadata.GraphQL.User.ID
+	return *userMetadata
 }
 
-// GetUserTimelineMedia retrieves all data starting after the endCursor supplied.
-func GetUserTimelineMedia(userID string, endCursor string) ([]structs.InstagramMedia, bool, string) {
-	url := buildGorammaNextPageURL(userID, endCursor)
+// GetUserMedia will retrieve a page of media results from the Instagram Graph API.
+func GetUserMedia(instagramToken string, endCursor string) structs.InstagramUserMedia {
+	url := fmt.Sprintf("%s/me/media?fields=id,media_type,media_url,username,timestamp,caption&limit=50&access_token=%s&after=%s", BaseURL, instagramToken, endCursor)
 	body := gorammaHTTPRequest(url)
 
-	var timeline = new(structs.IGAPITimeline)
-	err := json.Unmarshal(body, &timeline)
-
+	var userMedia = new(structs.InstagramUserMedia)
+	err := json.Unmarshal(body, &userMedia)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	timelineEdges := timeline.Data.User.Media.Edges
-	hasNextPage := timeline.Data.User.Media.PageInfo.HasNextPage
-	endCursor = timeline.Data.User.Media.PageInfo.EndCursor
-
-	var mediaTimelineSlice []structs.IGAPIMediaDetail
-
-	for i, edge := range timelineEdges {
-		shortcode := edge.Node.Shortcode
-
-		log.Info(fmt.Sprintf("Getting the details for media %d of %d...", i+1, len(timelineEdges)))
-		mediaDetail := getMediaDetailFromShortcode(shortcode)
-		mediaTimelineSlice = append(mediaTimelineSlice, *mediaDetail)
-	}
-
-	convertedMedia := convertMediaDetail(mediaTimelineSlice)
-	return convertedMedia, hasNextPage, endCursor
+	return *userMedia
 }

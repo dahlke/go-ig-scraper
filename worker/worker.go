@@ -1,33 +1,38 @@
 package workers
 
 import (
+	"fmt"
 	"time"
 
 	api "github.com/dahlke/goramma/api"
-	structs "github.com/dahlke/goramma/structs"
+	"github.com/dahlke/goramma/structs"
+
+	// structs "github.com/dahlke/goramma/structs"
 	log "github.com/sirupsen/logrus"
 )
 
 // GetDataFromInstagramForUser is used for testing that the API functions work as expected.
-func GetDataFromInstagramForUser(username string, inputEndCursor string) {
-	userID := api.GetUserIDFromMetadata(username)
-	pullAll := inputEndCursor == ""
-	var fullConvertedMediaTimeline []structs.InstagramMedia
-	endCursor := inputEndCursor
+func GetDataFromInstagramForUser(instagramToken string) {
+	userMetadata := api.GetUserMetadata(instagramToken)
+	fmt.Println(userMetadata)
+
+	var allInstagramMedia []structs.InstagramMedia
+	beforeEndCursor := ""
+	endCursor := ""
 
 	for true {
-		mediaTimeline, hasNextPage, newEndCursor := api.GetUserTimelineMedia(userID, endCursor)
-		endCursor = newEndCursor
-		fullConvertedMediaTimeline = append(mediaTimeline, fullConvertedMediaTimeline...)
+		log.Info(fmt.Sprintf("Fetching page of Instagram data with end cursor: %s ...", endCursor))
+		userMedia := api.GetUserMedia(instagramToken, endCursor)
+		allInstagramMedia = append(allInstagramMedia, userMedia.Data...)
+		beforeEndCursor = userMedia.Paging.Cursors.Before
+		endCursor = userMedia.Paging.Cursors.After
 
-		if hasNextPage && pullAll {
-			log.Info("Getting another page...")
-		} else {
+		if beforeEndCursor == endCursor {
+			log.Info("Finished fetching data from Instagram.")
 			break
 		}
-
-		time.Sleep(3 * time.Second)
+		time.Sleep(1 * time.Second)
 	}
-	// TODO: log the end cursor.
-	// fmt.Println(endCursor, fullConvertedMediaTimeline)
+
+	fmt.Println(allInstagramMedia)
 }
